@@ -62,7 +62,6 @@ class SnakeGame {
 		
 		//Update Score Counters
 		document.getElementById("ScoreCounter").innerText = "Score: ".concat(this.snake.tail.length.toString());
-		document.getElementById("HighScoreCounter").innerText = "High Score: ".concat(this.highScore.toString());
 		
 	
 		if (this.automated){
@@ -318,7 +317,7 @@ class SnakeGame {
 	var globalVisited = new Set();
 	globalVisited.add(toIndex(snakeX, snakeY));
 
-
+	var solutions = []
 	var item, newX, newY, index;
 	var directions = [[1,0],[0,1],[-1,0],[0,-1]];
 	
@@ -331,9 +330,7 @@ class SnakeGame {
 
 			if (optimal){
 				var simulatedTailList = this.SimulateTraversal([...tailList], snakeX, snakeY, item.directions)
-				if (this.CheckEscape(simulatedTailList, fruitX, fruitY) > .60){			
-					return(item.directions);
-				}
+				solutions.push([this.CheckEscape(simulatedTailList, fruitX, fruitY), item.directions])
 			}else{
 				return(item.directions);
 			}
@@ -387,7 +384,21 @@ class SnakeGame {
 		
 	
 	}
-	return([])
+	if (solutions.length){
+		solutions.sort(function(a, b) {
+			return a[0] > b[0];
+		  });
+		  
+
+		if (solutions[0][0] > tailList.length){
+			return(solutions[0][1])
+		}else{
+			return([])
+		}
+		
+	}else{
+		return([])
+	}
   }
 
   DFS(tailList, snakeX, snakeY, stepLimit, fruitX, fruitY, steps){
@@ -395,7 +406,7 @@ class SnakeGame {
 
 	//Returns object with directions that had the snake stall for a specific number of steps
 
-	var solution = [];
+	var solutions = [];
 	var snakeTailPos = new Set();
 
 	for (var i = 0; i < tailList.length; i++){
@@ -404,31 +415,40 @@ class SnakeGame {
 	
 
 	var stack = [{
-		x : snakeX,
-		y : snakeY, 
-		directions : [],
-		visited : new Set([toIndex(snakeX,snakeY)])
-	}]
+			x : snakeX,
+			y : snakeY, 
+			directions : [],
+			visited : new Set([toIndex(snakeX,snakeY)]),
+			orientation : [[1,0],[0,1],[-1,0],[0,-1]]
+		},
+		{
+			x : snakeX,
+			y : snakeY, 
+			directions : [],
+			visited : new Set([toIndex(snakeX,snakeY)]),
+			orientation : [[0,-1],[-1,0],[0,1],[1,0]]
+		}
+	]
 
-	var item, newX, newY, index;
-
-	var directions = [[1,0],[0,1],[-1,0],[0,-1]];
-	if (this.dfsCounter % 2 === 1){
-		directions = directions.reverse();
-	}
+	var item, newX, newY, index, directions;
 	
-
 	while (stack.length > 0){		
 		
 		item = stack.pop();
-		
-
-		if (item.directions.length > solution.length){
-			solution = item.directions;
-		}
+		directions = item.orientation;
 
 		if (item.directions.length >= stepLimit && steps){
-			return(item.directions)
+
+			var simulatedTailList = this.SimulateTraversal([...tailList], snakeX, snakeY, item.directions)
+			solutions.push([this.CheckEscape(simulatedTailList, fruitX, fruitY), item.directions])
+
+			if (solutions.length > 20){
+				solutions.sort(function(a, b) {
+					return a[0] > b[0];
+					});
+				return(solutions[0])
+			}
+						
 		}
 
 
@@ -466,13 +486,23 @@ class SnakeGame {
 				x : newX,
 				y : newY,
 				directions : item.directions.concat([[directions[i][0], directions[i][1]]]),
-				visited : tmpSet
+				visited : tmpSet,
+				orientation : directions
+
 			})
 			
 		}
 	
 	}
-	return(solution);
+	
+	if (solutions.length){
+		solutions.sort(function(a, b) {
+			return a[0] > b[0];
+			});
+		return(solutions[0])
+	}else{
+		return([]);
+	}
 
   }
 
@@ -545,7 +575,7 @@ class SnakeGame {
 	
 	}
 
-	return(simpleVisited.size / availableSquares);
+	return(simpleVisited.size);
 
 
   }
@@ -584,7 +614,6 @@ class SnakeGame {
 	
 	if (solution.length === 0){
 		console.log("Attempting DFS");
-		this.dfsCounter += 1;
 
 		this.snake.stressLevel = 1;
 		this.stressLevel = 1;
@@ -592,27 +621,34 @@ class SnakeGame {
 		var openTiles = this.CheckEscape(this.snake.tail, this.snake.x, this.snake.y); 
 		console.log(openTiles);
 		
-		if (openTiles * ((NUM_SQUARES * NUM_SQUARES) - this.snake.tail.length) === 0){
+		if (openTiles === 0){
 			this.gameOver = true;
 			return([]);
 
-		}else if (openTiles > .5){
-			
-			var dfs = this.DFS(this.snake.tail, this.snake.x, this.snake.y, Math.floor(openTiles * ((NUM_SQUARES * NUM_SQUARES) - this.snake.tail.length) / 3), this.fruit.x, this.fruit.y, true)	
-			console.log("get DFS 1");
-
 		}else{
 
-			var dfs = this.DFS(this.snake.tail, this.snake.x, this.snake.y, Math.floor(this.snake.tail.length / 10), this.fruit.x, this.fruit.y, true)	
-			console.log("get DFS 2");
-			
-		}
-		
-		if (dfs.length !== 0){
-			return(dfs)
-		}
-		
+			console.log("get DFS");
 
+			var dfsSolutions = []
+
+				for (var i = Math.floor(openTiles / 5); i < openTiles / 3; i += Math.floor(openTiles / 5)){
+					dfsSolutions.push(this.DFS(this.snake.tail, this.snake.x, this.snake.y, i, this.fruit.x, this.fruit.y, true));					
+				}
+
+				console.log(dfsSolutions);
+				
+				if (dfsSolutions.length){
+					dfsSolutions.sort(function(a, b) {
+						return a[0] > b[0];
+						});
+					return(dfsSolutions[0][1])
+				}else{
+					return([])
+				}
+			}
+			
+			
+	
 	}
 	this.snake.stressLevel = 0;
 	this.stressLevel = 0;
@@ -720,10 +756,12 @@ class Fruit{
 
 var Game;
 
-let BOARD_WIDTH = 1600;
-let BOARD_HEIGHT = 1000;
-let NUM_SQUARES = 200;
+let BOARD_WIDTH = Math.floor(window.innerWidth * .8);
+let BOARD_HEIGHT =  Math.floor(window.innerHeight * .8);
+let NUM_SQUARES = 50;
 let FRAME_RATE = 100;
+
+//console.log(window.innerWidth);
 
 function setup() {
 
