@@ -1,0 +1,23 @@
+body
+{
+    text-align: center;
+}
+head
+{
+    text-align: center;
+}
+
+#ScoreBox{
+
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    display: flex;
+    flex-direction: row;
+    font-size: 1.5em;
+    justify-content: center;
+    letter-spacing: .07em;
+}
+
+.counter{
+    margin: .2em 1em .2em 1em;
+}
+
