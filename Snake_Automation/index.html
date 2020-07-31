@@ -16,18 +16,24 @@
 	</head>
 	
     <body>
-		<div id="SettingsBox">
-			<div id="sizeSlider">
-				Size: 
-				<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-			</div>		
-
-			<button id="startBtn">Automate</button>
-		  </div>
-		  <div id="ScoreBox">
-			<div id="ScoreCounter" class="counter">
-				 Score: 0
+		<div id="UI_container">
+			<div class="header">
+				<div id="banner">
+					<h1>Automated Snake Game</h1>
+				</div>
 			</div>
-		</div>		
+			<div id="button_container">
+					<div id="range_container">
+						<div class="data_header">Size: </div>
+						<input type="range" class="slider" id="speedrange" min=5 max=120 defaultValue='50'></input>
+						<div class="data_header">Speed: </div>
+						<input type="range" class="slider" id="speedrange" min=5 max=120 defaultValue='50'></input>
+						<div id="ScoreCounter" class="data_header">
+							Score: 0
+					   </div>
+					</div>								
+				<button id="startBtn" type='button' class="control_button">Automate</button>
+			  </div>		
+		</div>
     </body>
     </html>
