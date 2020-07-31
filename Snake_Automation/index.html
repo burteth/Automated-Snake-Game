@@ -25,14 +25,14 @@
 			<div id="button_container">
 					<div id="range_container">
 						<div class="data_header">Size: </div>
-						<input type="range" class="slider" id="speedrange" min=5 max=120 defaultValue='50'></input>
+						<input type="range" class="slider" id="sizerange" min=5 max=200 defaultValue='50'></input>
 						<div class="data_header">Speed: </div>
-						<input type="range" class="slider" id="speedrange" min=5 max=120 defaultValue='50'></input>
+						<input type="range" class="slider" id="speedrange" min=10 max=100 defaultValue='100'></input>
 						<div id="ScoreCounter" class="data_header">
 							Score: 0
 					   </div>
 					</div>								
-				<button id="startBtn" type='button' class="control_button">Automate</button>
+				<button id="startBtn" type='button' class="control_button" onclick="setNewGame()">Automate</button>
 			  </div>		
 		</div>
     </body>

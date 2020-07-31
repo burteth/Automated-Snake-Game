@@ -1,6 +1,8 @@
 
 
 
+
+
 class SnakeGame {
   constructor(boardWidth, boardHeight, numSquares){
 
@@ -90,37 +92,7 @@ class SnakeGame {
 		this.steps.shift();
 	}	
 
-	// Draw Path Just for testing path
-	if (false){
-
-		var curX = this.snake.x;
-		var curY = this.snake.y;
-		
-
-		fill('yellow');
-		for(var i = 0; i < this.steps.length; i++){
-			curX += this.steps[i][0];
-			curY += this.steps[i][1];
-
-			rect(curX * this.width, curY * this.height, this.width, this.height)
-
-		}
-
-		this.snake.draw()
-		this.fruit.draw()
-
-		this.paused = true
-		return
-		//this.steps[0][0] = this.snake.xVel;
-		//this.steps[0][1] = this.snake.yVel;
-		//this.steps.shift();
-	}
-
-
 	
-
-
-
 
 	//Check bounds
 	if (this.snake.x < 0 || this.snake.x >= this.numSquares || this.snake.y < 0 || this.snake.y >= this.numSquares){
@@ -754,14 +726,24 @@ class Fruit{
 
 
 
+
 var Game;
 
-let BOARD_WIDTH = Math.floor(window.innerWidth * .8);
-let BOARD_HEIGHT =  Math.floor(window.innerHeight * .8);
-let NUM_SQUARES = 50;
-let FRAME_RATE = 100;
+let BOARD_WIDTH = Math.floor(window.innerWidth * .7);
+let BOARD_HEIGHT =  Math.floor(window.innerHeight * .7);
+//let NUM_SQUARES = 50;
+//let FRAME_RATE = 100;
 
-//console.log(window.innerWidth);
+var newGame = true;
+
+var NUM_SQUARES = 50;
+var FRAME_RATE = 50;
+
+
+
+function setNewGame(){
+	newGame = true;
+}
 
 function setup() {
 
@@ -776,6 +758,27 @@ function setup() {
 
 function draw() {
 
+	if(document.getElementById('startBtn').clicked === true){
+		newGame = true;
+		console.log('yep');
+		
+	}
+
+	if (newGame){
+		NUM_SQUARES = document.getElementById('sizerange').value;
+		FRAME_RATE = document.getElementById('speedrange').value;
+		
+		createCanvas(BOARD_WIDTH, BOARD_HEIGHT);
+		background(0) 
+
+		frameRate(FRAME_RATE);
+
+		Game = new SnakeGame(BOARD_WIDTH, BOARD_HEIGHT, NUM_SQUARES);
+
+		newGame = false;
+	}
+	
+	
 	Game.update()
 
 }
